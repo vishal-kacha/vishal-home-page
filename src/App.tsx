@@ -43,6 +43,19 @@ export default function App() {
         todosData.push({ id: doc.id, ...doc.data() });
       });
       setTodos(todosData);
+
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === "added") {
+          const todo = change.doc.data();
+          if (Notification.permission === "granted") {
+            new Notification("New Todo Added", {
+              body: todo.text,
+              icon: "/pwa-192x192.png",
+              tag: "todo-" + change.doc.id,
+            });
+          }
+        }
+      });
     });
 
     return () => unsubscribe();
