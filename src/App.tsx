@@ -38,7 +38,7 @@ export default function App() {
   useEffect(() => {
     const q = query(collection(db, "todos"), orderBy("createdAt", "desc"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const todosData = [];
+      const todosData: any = [];
       snapshot.forEach((doc) => {
         todosData.push({ id: doc.id, ...doc.data() });
       });
@@ -52,7 +52,7 @@ export default function App() {
   useEffect(() => {
     const q = query(collection(db, "events"), orderBy("createdAt", "desc"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const eventsData = [];
+      const eventsData: any = [];
       snapshot.forEach((doc) => {
         eventsData.push({ id: doc.id, ...doc.data() });
       });
@@ -86,14 +86,14 @@ export default function App() {
   };
 
   // Toggle todo completion
-  const toggleTodo = async (id, completed) => {
+  const toggleTodo = async (id: any, completed: any) => {
     await updateDoc(doc(db, "todos", id), {
       completed: !completed,
     });
   };
 
   // Delete todo from Firestore
-  const deleteTodo = async (id) => {
+  const deleteTodo = async (id: any) => {
     await deleteDoc(doc(db, "todos", id));
   };
 
@@ -109,12 +109,12 @@ export default function App() {
   };
 
   // Delete event from Firestore
-  const deleteEvent = async (id) => {
+  const deleteEvent = async (id: any) => {
     await deleteDoc(doc(db, "events", id));
   };
 
   // Update notes in Firestore
-  const updateNotes = async (content) => {
+  const updateNotes = async (content: any) => {
     setNotes(content);
     await setDoc(
       doc(db, "settings", "notes"),
@@ -194,7 +194,7 @@ export default function App() {
                   No todos yet. Add one above!
                 </p>
               ) : (
-                todos.map((todo) => (
+                todos.map((todo: any) => (
                   <div
                     key={todo.id}
                     className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
@@ -296,7 +296,7 @@ export default function App() {
                   No events scheduled yet!
                 </p>
               ) : (
-                events.map((event) => (
+                events.map((event: any) => (
                   <div
                     key={event.id}
                     className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg"

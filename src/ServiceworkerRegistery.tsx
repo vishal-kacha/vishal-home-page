@@ -50,7 +50,7 @@ export function ProductivityHub() {
 
     // Listen for foreground messages
     onMessageListener()
-      .then((payload) => {
+      .then((payload: any) => {
         console.log("Received foreground message:", payload);
         setNotification({
           title: payload.notification?.title,
