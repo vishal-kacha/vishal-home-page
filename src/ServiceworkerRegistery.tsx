@@ -52,12 +52,22 @@ export function ProductivityHub() {
     onMessageListener()
       .then((payload: any) => {
         console.log("Received foreground message:", payload);
+
+        // Show system notification
+        if (Notification.permission === "granted") {
+          new Notification(payload.notification?.title || "New Notification", {
+            body: payload.notification?.body || "You have a new message",
+            icon: payload.notification?.icon || "/pwa-192x192.png",
+            tag: payload.data?.tag || "fcm-app-notification",
+          });
+        }
+
+        // Optional: also show in-app toast
         setNotification({
           title: payload.notification?.title,
           body: payload.notification?.body,
         });
 
-        // Auto-dismiss after 5 seconds
         setTimeout(() => setNotification(null), 5000);
       })
       .catch((err) => console.log("Failed to receive message:", err));
