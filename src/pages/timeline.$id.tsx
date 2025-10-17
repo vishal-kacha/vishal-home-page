@@ -1,35 +1,35 @@
-import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router";
+import { useQuery } from "@tanstack/react-query";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { ArrowLeft, Circle, CheckCircle2 } from "lucide-react";
+import type { DailyData } from "../types";
+
+const fetchDay = async (id: string): Promise<DailyData | null> => {
+  const docRef = doc(db, "dailyDocs", id);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    return { id: docSnap.id, ...docSnap.data() } as DailyData;
+  }
+  return null;
+};
 
 export default function TimelineDetail() {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [day, setDay] = useState(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadDay();
-  }, [id]);
+  const {
+    data: day,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["day", id],
+    queryFn: () => fetchDay(id!),
+    enabled: !!id,
+  });
 
-  const loadDay = async () => {
-    try {
-      const docRef = doc(db, "dailyDocs", id);
-      const docSnap = await getDoc(docRef);
-
-      if (docSnap.exists()) {
-        setDay({ id: docSnap.id, ...docSnap.data() });
-      }
-    } catch (error) {
-      console.error("Error loading day:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="max-w-4xl mx-auto py-12 px-4">
         <div className="flex items-center justify-center py-12">
@@ -39,7 +39,7 @@ export default function TimelineDetail() {
     );
   }
 
-  if (!day) {
+  if (isError || !day) {
     return (
       <div className="max-w-4xl mx-auto py-12 px-4">
         <button
@@ -110,7 +110,7 @@ export default function TimelineDetail() {
                     </h2>
                   </div>
                   <div className="space-y-4">
-                    {day.notes.map((note, i) => {
+                    {day.notes!.map((note, i) => {
                       const noteContent = typeof note === "string" ? note : note.content || "";
 
                       return noteContent ? (
@@ -134,11 +134,11 @@ export default function TimelineDetail() {
                       Tasks
                     </h2>
                     <span className="ml-auto text-xs text-zinc-400 dark:text-zinc-600 bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded">
-                      {day.todos.filter((t) => t.status).length}/{day.todos.length} completed
+                      {day.todos!.filter((t) => t.status).length}/{day.todos!.length} completed
                     </span>
                   </div>
                   <div className="space-y-2">
-                    {day.todos.map((todo) => (
+                    {day.todos!.map((todo) => (
                       <div
                         key={todo.id}
                         className="flex items-start gap-3 p-3 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"

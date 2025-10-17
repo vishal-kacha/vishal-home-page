@@ -1,38 +1,39 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { useDebounce } from "@uidotdev/usehooks";
 import { Plus, X } from "lucide-react";
-import type { Note, NotesProps } from "../types";
+import type { NotesProps } from "../types";
 
 export default function Notes({ notes, onUpdateNotes }: NotesProps) {
   const [activeTab, setActiveTab] = useState(0);
   const [localNotes, setLocalNotes] = useState(notes);
-  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Debounce the  notes to reduce Firebase writes
+  const debouncedNotes = useDebounce(localNotes, 500);
 
   // Sync with parent when notes change externally (from Firebase listener)
   useEffect(() => {
     setLocalNotes(notes);
   }, [notes]);
 
-  const debouncedSave = (updatedNotes: Note[]) => {
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
+  // Save to Firebase when debounced notes change
+  useEffect(() => {
+    // Only save if the debounced notes are different from the parent notes
+    if (JSON.stringify(debouncedNotes) !== JSON.stringify(notes)) {
+      onUpdateNotes(debouncedNotes);
     }
-    debounceTimerRef.current = setTimeout(() => {
-      onUpdateNotes(updatedNotes);
-    }, 500);
-  };
+  }, [debouncedNotes]);
 
   const updateNoteContent = (content: string) => {
     const updatedNotes = [...localNotes];
     updatedNotes[activeTab] = { ...updatedNotes[activeTab], content };
     setLocalNotes(updatedNotes); // Update local state immediately
-    debouncedSave(updatedNotes); // Debounce Firebase save
   };
 
   const addNewNote = () => {
     const newNote = { id: Date.now(), content: "" };
     const updatedNotes = [...localNotes, newNote];
     setLocalNotes(updatedNotes);
-    onUpdateNotes(updatedNotes);
+    onUpdateNotes(updatedNotes); // Save immediately for structural changes
     setActiveTab(updatedNotes.length - 1);
   };
 
@@ -43,14 +44,14 @@ export default function Notes({ notes, onUpdateNotes }: NotesProps) {
       // If it's the last note, just clear its content
       const updatedNotes = [{ id: Date.now(), content: "" }];
       setLocalNotes(updatedNotes);
-      onUpdateNotes(updatedNotes);
+      onUpdateNotes(updatedNotes); // Save immediately for structural changes
       setActiveTab(0);
       return;
     }
 
     const updatedNotes = localNotes.filter((_, i) => i !== index);
     setLocalNotes(updatedNotes);
-    onUpdateNotes(updatedNotes);
+    onUpdateNotes(updatedNotes); // Save immediately for structural changes
 
     if (activeTab >= updatedNotes.length) {
       setActiveTab(updatedNotes.length - 1);
@@ -84,7 +85,7 @@ export default function Notes({ notes, onUpdateNotes }: NotesProps) {
               <span className="text-sm truncate flex-1">{index + 1}</span>
               <button
                 onClick={(e) => deleteNote(index, e)}
-                className="opacity-0 group-hover:opacity-100 hover:bg-zinc-200 dark:hover:bg-zinc-600 rounded p-0.5 transition-all"
+                className=" hover:bg-zinc-200 dark:hover:bg-zinc-600 rounded p-0.5 transition-all"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -106,7 +107,7 @@ export default function Notes({ notes, onUpdateNotes }: NotesProps) {
           value={localNotes[activeTab]?.content || ""}
           onChange={(e) => updateNoteContent(e.target.value)}
           placeholder="Start typing..."
-          className="w-full h-full p-6 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 resize-none focus:outline-none font-mono text-sm leading-relaxed"
+          className="w-full min-h-56 h-full p-6 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 resize-none focus:outline-none font-mono text-sm leading-relaxed"
           spellCheck="false"
         />
       </div>

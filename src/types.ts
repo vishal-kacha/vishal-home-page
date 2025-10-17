@@ -10,6 +10,7 @@ export type Note = {
 };
 
 export type DailyData = {
+  id: string;
   date: string;
   notes: Note[];
   todos: Todo[];

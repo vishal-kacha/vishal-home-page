@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --port 5177",
+    "dev": "vite --port 5177 --host",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -16,10 +16,12 @@
     "date-fns": "^4.1.0",
     "firebase": "^12.4.0",
     "lucide-react": "^0.545.0",
+    "motion": "^12.23.24",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-error-boundary": "^6.0.0",
     "react-router": "^7.9.4",
+    "react-swipeable": "^7.0.2",
     "tailwindcss": "^4.1.14",
     "zod": "^4.1.12"
   },

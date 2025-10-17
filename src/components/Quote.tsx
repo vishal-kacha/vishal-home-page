@@ -39,47 +39,42 @@ function QuoteContent(): JSX.Element {
     queryKey: ["quote"],
     queryFn: fetchRandomQuote,
     staleTime: 1000 * 60 * 60, // 1 hour
-    gcTime: 1000 * 60 * 60 * 24, // 24 hours (formerly cacheTime)
+    gcTime: 1000 * 60 * 60 * 24, // 24 hours
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
 
+  const renderQuote = (text: string, author: string) => (
+    <div className="w-full max-w-md md:max-w-xl px-4 sm:px-6 py-4 mx-auto text-center">
+      <div className="flex flex-col items-center justify-center text-zinc-700 dark:text-zinc-200">
+        <QuoteIcon className="w-5 h-5 sm:w-6 sm:h-6 mb-2 text-zinc-900 dark:text-zinc-50 fill-zinc-900 dark:fill-zinc-50" />
+        <p className="text-base sm:text-lg md:text-xl font-medium leading-relaxed text-zinc-700 dark:text-zinc-200">
+          {text}
+        </p>
+      </div>
+      <div className="mt-3 text-sm sm:text-base font-semibold text-zinc-500 dark:text-zinc-400 text-right">
+        — {author}
+      </div>
+    </div>
+  );
+
   if (isLoading) {
     return (
-      <div className="max-w-xl my-6 space-y-3 mx-auto">
-        <div className="flex items-start gap-3 text-zinc-600 dark:text-zinc-400">
-          <QuoteIcon className="w-5 h-5 mt-1 flex-shrink-0 animate-pulse" />
-          <p className="md:text-lg font-medium leading-relaxed text-center">Loading quote...</p>
+      <div className="w-full max-w-md md:max-w-xl px-4 sm:px-6 py-4 mx-auto animate-pulse">
+        <div className="flex flex-col items-center space-y-2 text-zinc-600 dark:text-zinc-400">
+          <QuoteIcon className="w-5 h-5 sm:w-6 sm:h-6 mt-1" />
+          <div className="h-4 w-3/4 bg-zinc-200 dark:bg-zinc-700 rounded-md" />
+          <div className="h-3 w-1/2 bg-zinc-200 dark:bg-zinc-700 rounded-md" />
         </div>
       </div>
     );
   }
 
   if (isError || !quote) {
-    return (
-      <div className="max-w-xl my-6 space-y-3 mx-auto">
-        <div className="flex items-start gap-3 text-zinc-700 dark:text-zinc-200">
-          <QuoteIcon className="w-5 h-5 mt-1 flex-shrink-0 text-zinc-950 dark:text-zinc-50 fill-zinc-950 dark:fill-zinc-50" />
-          <p className="md:text-lg font-medium leading-relaxed text-center">{DEFAULT_QUOTE.text}</p>
-        </div>
-        <div className="flex items-center justify-end gap-3 text-zinc-600 dark:text-zinc-400">
-          <p className="text-sm font-semibold">— {DEFAULT_QUOTE.author}</p>
-        </div>
-      </div>
-    );
+    return renderQuote(DEFAULT_QUOTE.text, DEFAULT_QUOTE.author);
   }
 
-  return (
-    <div className="max-w-xl my-6 space-y-3 mx-auto">
-      <div className="flex items-start gap-3 text-zinc-700 dark:text-zinc-200">
-        <QuoteIcon className="w-5 h-5 mt-1 flex-shrink-0 text-zinc-950 dark:text-zinc-50 fill-zinc-950 dark:fill-zinc-50" />
-        <p className="md:text-lg font-medium leading-relaxed text-center">{quote.text}</p>
-      </div>
-      <div className="flex items-center justify-end gap-3 text-zinc-600 dark:text-zinc-400">
-        <p className="text-sm font-semibold">— {quote.author}</p>
-      </div>
-    </div>
-  );
+  return renderQuote(quote.text, quote.author);
 }
 
 export default function Quote(): JSX.Element {

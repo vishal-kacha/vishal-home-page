@@ -1,24 +1,59 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useIntersectionObserver } from "@uidotdev/usehooks";
-import { collection, query, orderBy, limit, startAfter, getDocs } from "firebase/firestore";
+import {
+  collection,
+  query,
+  orderBy,
+  limit,
+  startAfter,
+  getDocs,
+  QueryDocumentSnapshot,
+  type DocumentData,
+  QuerySnapshot,
+  QueryConstraint,
+  where,
+} from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { Calendar, Circle, CheckCircle2 } from "lucide-react";
+import type { DailyData, Todo, Note } from "../types";
+import type { JSX } from "react";
 
 const ITEMS_PER_PAGE = 10;
 
-async function fetchDays({ pageParam = null }) {
-  const constraints = [collection(db, "dailyDocs"), orderBy("date", "desc"), limit(ITEMS_PER_PAGE)];
+type FetchDaysParams = {
+  pageParam: QueryDocumentSnapshot<DocumentData> | null;
+};
+
+type FetchDaysResponse = {
+  days: DailyData[];
+  nextCursor: QueryDocumentSnapshot<DocumentData> | undefined;
+  hasMore: boolean;
+};
+
+async function fetchDays({ pageParam = null }: FetchDaysParams): Promise<FetchDaysResponse> {
+  // Get end of today to filter out future dates
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
+  const todayDateString = today.toISOString().split("T")[0];
+
+  const constraints: QueryConstraint[] = [
+    where("date", "<=", todayDateString),
+    orderBy("date", "desc"),
+    limit(ITEMS_PER_PAGE),
+  ];
 
   if (pageParam) {
     constraints.push(startAfter(pageParam));
   }
 
-  const q = query(...constraints);
-  const snapshot = await getDocs(q);
+  const q = query(collection(db, "dailyDocs"), ...constraints);
+  const snapshot: QuerySnapshot<DocumentData> = await getDocs(q);
 
-  const daysData = snapshot.docs.map((doc) => ({
+  const daysData: DailyData[] = snapshot.docs.map((doc) => ({
     id: doc.id,
-    ...doc.data(),
+    date: doc.data().date as string,
+    notes: (doc.data().notes as Note[]) || [],
+    todos: (doc.data().todos as Todo[]) || [],
   }));
 
   return {
@@ -28,16 +63,23 @@ async function fetchDays({ pageParam = null }) {
   };
 }
 
-export default function Timeline() {
+export default function Timeline(): JSX.Element {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } =
-    useInfiniteQuery({
+    useInfiniteQuery<
+      FetchDaysResponse,
+      Error,
+      { pages: FetchDaysResponse[] },
+      [string],
+      QueryDocumentSnapshot<DocumentData> | null
+    >({
       queryKey: ["timeline"],
       queryFn: fetchDays,
-      getNextPageParam: (lastPage) => (lastPage.hasMore ? lastPage.nextCursor : undefined),
+      getNextPageParam: (lastPage: FetchDaysResponse) =>
+        lastPage.hasMore ? lastPage.nextCursor : undefined,
       initialPageParam: null,
     });
 
-  const [ref, entry] = useIntersectionObserver({
+  const [ref, entry] = useIntersectionObserver<HTMLDivElement>({
     threshold: 0,
     rootMargin: "100px",
   });
@@ -47,7 +89,7 @@ export default function Timeline() {
     fetchNextPage();
   }
 
-  const allDays = data?.pages.flatMap((page) => page.days) ?? [];
+  const allDays: DailyData[] = data?.pages?.flatMap((page: FetchDaysResponse) => page.days) ?? [];
 
   if (isLoading) {
     return (
@@ -81,10 +123,10 @@ export default function Timeline() {
         <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-500 via-zinc-200 to-zinc-200 dark:from-blue-600 dark:via-zinc-800 dark:to-zinc-800"></div>
 
         <div className="space-y-8">
-          {allDays.map((day) => {
-            const hasNotes = day.notes && Array.isArray(day.notes) && day.notes.length > 0;
-            const hasTodos = day.todos && Array.isArray(day.todos) && day.todos.length > 0;
-            const hasContent = hasNotes || hasTodos;
+          {allDays.map((day: DailyData) => {
+            const hasNotes: boolean = day.notes && Array.isArray(day.notes) && day.notes.length > 0;
+            const hasTodos: boolean = day.todos && Array.isArray(day.todos) && day.todos.length > 0;
+            const hasContent: boolean = hasNotes || hasTodos;
 
             return (
               <div key={day.id} className="relative flex gap-6">
@@ -129,8 +171,8 @@ export default function Timeline() {
                             </span>
                           </div>
                           <div className="space-y-2">
-                            {day.notes.map((note, i) => {
-                              const noteContent =
+                            {day.notes.map((note: Note | string, i: number) => {
+                              const noteContent: string =
                                 typeof note === "string" ? note : note.content || "";
 
                               return noteContent ? (
@@ -155,11 +197,11 @@ export default function Timeline() {
                               Tasks
                             </span>
                             <span className="ml-auto text-xs text-zinc-400 dark:text-zinc-600">
-                              {day.todos.filter((t) => t.status).length}/{day.todos.length}
+                              {day.todos.filter((t: Todo) => t.status).length}/{day.todos.length}
                             </span>
                           </div>
                           <div className="space-y-1">
-                            {day.todos.slice(0, 3).map((todo) => (
+                            {day.todos.slice(0, 3).map((todo: Todo) => (
                               <div key={todo.id} className="flex items-center gap-2.5 py-1.5">
                                 {todo.status ? (
                                   <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
