@@ -1,15 +1,9 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import {
-  format,
-  startOfMonth,
-  endOfMonth,
-  eachDayOfInterval,
-  isSameDay,
-  getDay,
-} from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, getDay } from "date-fns";
+import type { DatePickerProps } from "../types";
 
-export default function DatePicker({ selectedDate, onDateChange }) {
+export default function DatePicker({ selectedDate, setSelectedDate }: DatePickerProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const today = new Date();
   const monthStart = startOfMonth(currentMonth);
@@ -18,19 +12,15 @@ export default function DatePicker({ selectedDate, onDateChange }) {
   const firstDayOfMonth = getDay(monthStart);
 
   const handlePrevMonth = () => {
-    setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1)
-    );
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
   };
 
   const handleNextMonth = () => {
-    setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1)
-    );
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
   };
 
-  const handleDateClick = (date) => {
-    onDateChange(date);
+  const handleDateClick = (date: Date) => {
+    setSelectedDate(date);
   };
 
   return (
@@ -43,9 +33,7 @@ export default function DatePicker({ selectedDate, onDateChange }) {
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <span className="font-semibold">
-            {format(currentMonth, "MMMM yyyy")}
-          </span>
+          <span className="font-semibold">{format(currentMonth, "MMMM yyyy")}</span>
           <button
             onClick={handleNextMonth}
             className="p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full cursor-pointer"

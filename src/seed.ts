@@ -1,4 +1,4 @@
-const quotes = [
+export const quotes = [
   {
     text: "The best way to predict the future is to invent it.",
     author: "Alan Kay",

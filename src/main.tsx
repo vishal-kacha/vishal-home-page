@@ -5,6 +5,7 @@ import Home from "./pages/index.tsx";
 import Theme from "./components/theme-toggle.tsx";
 import Timeline from "./pages/timeline.tsx";
 import TimelineDetail from "./pages/timeline.$id.tsx";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 /**
  * To dos:
@@ -12,16 +13,20 @@ import TimelineDetail from "./pages/timeline.$id.tsx";
  *  - Kanban
  */
 
+const queryClient = new QueryClient();
+
 createRoot(document.getElementById("root")!).render(
   <div className="container mx-auto">
-    <Theme />
+    <QueryClientProvider client={queryClient}>
+      <Theme />
 
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/timeline" element={<Timeline />} />
-        <Route path="/timeline/:id" element={<TimelineDetail />} />
-      </Routes>
-    </BrowserRouter>
-  </div>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/timeline" element={<Timeline />} />
+          <Route path="/timeline/:id" element={<TimelineDetail />} />
+        </Routes>
+      </BrowserRouter>
+    </QueryClientProvider>
+  </div>,
 );

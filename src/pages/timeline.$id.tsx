@@ -56,10 +56,8 @@ export default function TimelineDetail() {
     );
   }
 
-  const hasNotes =
-    day.notes && Array.isArray(day.notes) && day.notes.length > 0;
-  const hasTodos =
-    day.todos && Array.isArray(day.todos) && day.todos.length > 0;
+  const hasNotes = day.notes && Array.isArray(day.notes) && day.notes.length > 0;
+  const hasTodos = day.todos && Array.isArray(day.todos) && day.todos.length > 0;
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
@@ -113,14 +111,10 @@ export default function TimelineDetail() {
                   </div>
                   <div className="space-y-4">
                     {day.notes.map((note, i) => {
-                      const noteContent =
-                        typeof note === "string" ? note : note.content || "";
+                      const noteContent = typeof note === "string" ? note : note.content || "";
 
                       return noteContent ? (
-                        <div
-                          key={i}
-                          className="p-4 bg-zinc-50 dark:bg-zinc-800 rounded-lg"
-                        >
+                        <div key={i} className="p-4 bg-zinc-50 dark:bg-zinc-800 rounded-lg">
                           <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-wrap">
                             {noteContent}
                           </p>
@@ -140,8 +134,7 @@ export default function TimelineDetail() {
                       Tasks
                     </h2>
                     <span className="ml-auto text-xs text-zinc-400 dark:text-zinc-600 bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded">
-                      {day.todos.filter((t) => t.status).length}/
-                      {day.todos.length} completed
+                      {day.todos.filter((t) => t.status).length}/{day.todos.length} completed
                     </span>
                   </div>
                   <div className="space-y-2">
