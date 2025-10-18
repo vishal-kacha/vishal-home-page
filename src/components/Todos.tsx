@@ -47,7 +47,10 @@ export default function Todos({ todos, onUpdateTodos }: TodosProps) {
             key={todo.id}
             className="group flex items-start gap-3 p-3 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
           >
-            <button onClick={() => handleToggleTodo(todo.id)} className="mt-0.5 flex-shrink-0">
+            <button
+              onClick={() => handleToggleTodo(todo.id)}
+              className="mt-0.5 flex-shrink-0 cursor-pointer"
+            >
               {todo.status ? (
                 <CheckCircle2 className="w-5 h-5 text-blue-500" />
               ) : (
@@ -65,7 +68,7 @@ export default function Todos({ todos, onUpdateTodos }: TodosProps) {
             </span>
             <button
               onClick={() => handleDeleteTodo(todo.id)}
-              className="opacity-0 group-hover:opacity-100 flex-shrink-0 p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition-all"
+              className="flex-shrink-0 p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition-all cursor-pointer"
             >
               <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
             </button>

@@ -85,7 +85,7 @@ export default function Notes({ notes, onUpdateNotes }: NotesProps) {
               <span className="text-sm truncate flex-1">{index + 1}</span>
               <button
                 onClick={(e) => deleteNote(index, e)}
-                className=" hover:bg-zinc-200 dark:hover:bg-zinc-600 rounded p-0.5 transition-all"
+                className=" hover:bg-zinc-200 dark:hover:bg-zinc-600 rounded p-0.5 transition-all cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -94,7 +94,7 @@ export default function Notes({ notes, onUpdateNotes }: NotesProps) {
         </div>
         <button
           onClick={addNewNote}
-          className="px-3 py-2.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors border-l border-zinc-200 dark:border-zinc-800"
+          className="px-3 py-2.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors border-l border-zinc-200 dark:border-zinc-800 cursor-pointer"
           title="New note"
         >
           <Plus className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
@@ -107,7 +107,7 @@ export default function Notes({ notes, onUpdateNotes }: NotesProps) {
           value={localNotes[activeTab]?.content || ""}
           onChange={(e) => updateNoteContent(e.target.value)}
           placeholder="Start typing..."
-          className="w-full min-h-56 h-full p-6 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 resize-none focus:outline-none font-mono text-sm leading-relaxed"
+          className="w-full min-h-56 md:min-h-96 h-full p-6 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 resize-none focus:outline-none font-mono text-sm leading-relaxed"
           spellCheck="false"
         />
       </div>
