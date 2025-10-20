@@ -97,14 +97,24 @@ export default function Home() {
     onMutate: (todos) => dailyData && setDailyData({ ...dailyData, todos }),
   });
 
-  // Loading placeholder
   if (isLoading || !dailyData) {
     return (
-      <div className="relative mt-12">
+      <div className="relative mt-12 px-2 md:px-6">
         <Greeting />
         <Quote />
-        <div className="mt-10 grid md:grid-cols-3 gap-6">
-          <DatePicker selectedDate={selectedDate} setSelectedDate={() => {}} />
+
+        <div className="flex justify-end mb-4 md:mb-6">
+          <Link
+            to={`/timeline/${dateStr}`}
+            className="flex items-center gap-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            View Timeline
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        <div className="hidden md:grid md:grid-cols-3 gap-6 mt-8">
+          <DatePicker selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
           <Notes notes={[{ id: Date.now(), content: "" }]} onUpdateNotes={() => {}} />
           <Todos todos={[]} onUpdateTodos={() => {}} />
         </div>
